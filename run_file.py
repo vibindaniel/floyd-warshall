@@ -26,10 +26,10 @@ class Program():
     def initialize_parameters(self):
         for i in range(0, self.N):
             for k in range(0, self.k):
-                r = randint(0, self.N - 1)
-                while r is i and self.a[i][r] is 1:
-                    r = randint(0, self.N - 1)
-                self.a[i][r] = 1
+                j = randint(0, self.N - 1)
+                while j is i and self.a[i][j] is 1:
+                    j = randint(0, self.N - 1)
+                self.a[i][j] = 1
         for i in range(0, self.N):
             for j in range(0, self.N):
                 self.b[i][j] = abs(int(self.d[j]) - int(self.d[i]))
