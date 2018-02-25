@@ -11,8 +11,8 @@ class Program():
     next = []
     link_cost = []
 
-    def __init__(self, data):
-        self.k = data["k"]
+    def __init__(self, data, k):
+        self.k = k
         self.N = data["N"]
         self.d = str(data["d"]) * 2
 
@@ -43,7 +43,8 @@ class Program():
         # and a[i][j] = 100 where i is not j
         for i in range(0, self.N):
             for j in range(0, self.N):
-                self.b[i][j] = abs(int(self.d[j]) - int(self.d[i]))
+                if i is not j:
+                    self.b[i][j] = abs(int(self.d[j]) - int(self.d[i]))
                 self.next[i][j] = j
                 if self.a[i][j] is not 1:
                     self.a[i][j] = 100
@@ -71,23 +72,39 @@ class Program():
                 if i is not j and self.next[i][j] is not 0:
                     p = i
                     n = self.next[i][j]
-                    sum = 0
+                    b = self.b[i][j]
+                    while n is not j:
+                        self.link_cost[p][n] += b
+                        p = n
+                        n = self.next[n][j]
+                    self.link_cost[p][n] += b
+
+    def get_opt_cost(self):
+        opt_cost = 0
+        edges = 0
+        for i in range(0, self.N):
+            for j in range(0, self.N):
+                sum = 0
+                if self.link_cost[i][j] is not 0:
+                    edges += 1
+                if i is not j and self.next[i][j] is not 0:
+                    p = i
+                    n = self.next[i][j]
                     while n is not j:
                         sum += self.a[p][n]
                         p = n
                         n = self.next[n][j]
                     sum += self.a[p][n]
-                    self.link_cost[i][j] = sum * self.b[i][j]
-
-    def get_opt_cost(self):
-        opt_cost = 0
-        for i in range(0, self.N):
-            opt_cost += sum(self.link_cost[i])
-        print(opt_cost)
+                opt_cost += self.b[i][j] * sum
+        print("Optimal Cost: {0}".format(opt_cost))
+        print("Density is: {0}".format(edges / (self.N * (self.N - 1))))
 
 
 if __name__ == '__main__':
     with open('config.json') as data:
-        p = Program(json.load(data))
-        p.initialize_parameters()
-        p.start_algorithm()
+        d = json.load(data)
+        for k in range(3, 15):
+            print("k: {0}".format(k))
+            p = Program(d, k)
+            p.initialize_parameters()
+            p.start_algorithm()
